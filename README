@@ -20,24 +20,8 @@ review any patches that you want to send my way.  (It may take a while.)
 
 Ideas:
 
-None of this will happen unless someone volunteers to do it.
+I've entered a few ideas into the Issue tracker:
 
-- improve XPath Checker's automatically generated expressions to use
-things like CSS classes.  (There should probably be a way to rotate
-between different possibilities since no single way is best for all
-websites.)
+http://code.google.com/p/xpathchecker/issues/list?can=2&q=type:Feature
 
-- keep a history of recent xpath expressions and do autocompletion.
-Ideally this will be context-sensitive, so only the xpath expressions
-that could possibly work will show up.
-
-- add a way to save your favorite xpath expressions in something
-like bookmarks
-
-- add a way to upload your favorite expressions to a server and
-download other people's xpath expresions
-
-- unit testing: if you could save xpath expressions, target URL's,
-and expected results, XPath Checker could be used as a simple test
-suite for a website.  (This was actually my original goal for XPath
-Checker before discovering something more fun.)
+None of them will happen unless someone volunteers to do it.
