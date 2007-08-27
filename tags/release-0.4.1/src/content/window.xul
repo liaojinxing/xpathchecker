@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<window
+    id="xpathchecker-window"
+    title="XPath Checker"
+    orient="vertical"
+    onload="onLoad()"
+    persist="width height x y"
+    width="700"
+    height="500"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    xmlns:html="http://www.w3.org/1999/xhtml">
+
+    <script src="window.js"/>
+
+    <vbox flex="1">
+
+        <hbox align="center">
+            <label control="xpath" value="XPath:"/>
+            <textbox id="xpath" flex="1" type="timed" timeout="500"/>
+        </hbox>
+
+        <groupbox id="namespace-box" align="center" collapsed="true" orient="horizontal" pack="start">
+            <caption label="Namespaces"/>
+
+            <grid>
+                <columns>
+                  <column/>
+                  <column/>
+                </columns>
+                <rows id="prefixrows"/>
+            </grid>
+
+        </groupbox>
+
+        <groupbox flex="5">
+           <caption id="results-caption" label="Results"/>
+           <vbox flex="1">
+               <label id="status"/>
+               <deck flex="1" selectedIndex="0" id="resultsDeck">
+                  <spacer flex="1"/>
+                  <vbox flex="1" style="overflow: auto">
+                     <grid flex="1">
+                       <columns>
+                         <column/>
+                         <column flex="1"/>
+                       </columns>
+                       <rows id="resultrows"/>
+                     </grid>
+                     <spacer flex="10"/>
+                   </vbox>
+                 <iframe id="resultsFrame" type="content" flex="1"/>
+               </deck>
+           </vbox>
+        </groupbox>
+
+  </vbox>
+
+</window>

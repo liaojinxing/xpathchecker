@@ -1,0 +1,6 @@
+<?xml version="1.0" standalone="yes" ?>
+<outer xmlns="http://www.example.org/outer">
+  <in:inner xml:id="child" xmlns:in="http://www.example.org/inner">
+    Hello!
+  </in:inner>
+</outer>
