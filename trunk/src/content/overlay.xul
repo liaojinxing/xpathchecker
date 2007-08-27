@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<overlay id="xpathcheckerOverlay" 
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script src="chrome://xpathchecker/content/overlay.js"/>
+
+  <menupopup id="contentAreaContextMenu">
+    <menuitem id="viewSelectionsXPathMenuItem"
+              label="View XPath"
+              insertafter="context-viewpartialsource-selection"
+              accesskey="X"
+              oncommand="showXPathWindow()" />
+  </menupopup>
+
+</overlay>

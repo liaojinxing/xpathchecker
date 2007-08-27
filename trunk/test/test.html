@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<script src="jsUnitCore.js" type="text/javascript"></script>
+<script src="../src/content/window.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    function setUp() {
+        html = document.documentElement
+        body = document.documentElement.getElementsByTagName("body").item(0)
+        hello = document.getElementById("hello")
+        hello2 = document.getElementById("hello2")
+        hello2div2 = hello2.getElementsByTagName("DIV").item(2)
+        hello2div2text2 = hello2div2.lastChild
+        assertEquals("Text", hello2div2text2.nodeValue)
+        table = document.getElementById("table")
+    }
+
+    function testXPathEvaluator() {
+        var result = document.evaluate("/html/body", document, null, XPathResult.ANY_TYPE, null);
+        var item = result.iterateNext()
+        assertEquals("BODY", item.nodeName)
+        assertEquals("HTML", item.parentNode.nodeName)
+    }
+
+    function testGetXPathNodes() {
+        var list = getXPathNodes(document, "/html/body", null)
+        assertEquals(body, list[0])
+        assertEquals(1, list.length)
+    }
+
+    function testGetXPathText() {
+        var list = getXPathNodes(document, "//*[@id='hello']/text()", null)
+        assertEquals("Hello!", list[0].nodeValue)
+        assertEquals(1, list.length)
+    }
+
+    function testGetNodePath() {
+        var nodePath = getNodePath(body)
+        assertEquals(html, nodePath[0])
+        assertEquals(body, nodePath[1])
+        assertEquals(2, nodePath.length)
+    }
+
+    function testGetNodePathForElementWithId() {
+        var nodePath = getNodePath(hello)
+        assertEquals(hello, nodePath[0])
+        assertEquals(1, nodePath.length)
+    }
+
+    function testGetNodePathForText() {
+        var nodePath = getNodePath(hello.firstChild)
+        assertEquals(hello, nodePath[0])
+        assertEquals(hello.firstChild, nodePath[1])
+        assertEquals(2, nodePath.length)
+    }
+
+    function testGetNodeIndex() {
+        assertEquals("failed for html", null, getNodeIndex(document.documentElement))
+        assertEquals("failed for body", null, getNodeIndex(document.documentElement.getElementsByTagName("body")))
+        assertEquals(1, getNodeIndex(hello))
+        assertEquals(2, getNodeIndex(hello2))
+        assertEquals(2, getNodeIndex(hello2div2))
+    }
+
+    function testGetXPath() {
+        assertEquals("/html", getXPath(html))
+        assertEquals("/html/body", getXPath(body))
+    }
+
+    function testGetXPathForElementWithId() {
+        assertEquals("id('hello')", getXPath(hello))
+    }
+
+    function testGetXPathForText() {
+        assertEquals("id('hello')/text()", getXPath(hello.firstChild))
+    }
+
+    function testGetXpathForSecondElement() {
+        assertEquals("id('hello2')/div[2]", getXPath(hello2div2))
+    }
+
+    function testGetXpathForSecondText() {
+        assertEquals("id('hello2')/div[2]/text()[2]", getXPath(hello2div2text2))
+    }
+
+    function testGetXPathForUppercaseXml() {
+        var xmlDoc = document.getElementById("uppercase-xml").contentDocument
+        assertTrue(xmlDoc instanceof XMLDocument)
+        var xmlNode = xmlDoc.getElementsByTagName("INNER")[0]
+        assertTrue(xmlNode instanceof Element)
+        assertEquals("/OUTER/INNER", getXPath(xmlNode))
+    }
+
+    function testIsValidXPath() {
+        assertTrue(isValidXPath("//hello", null))
+        assertFalse(isValidXPath("/hello[", null))
+    }
+
+    function testGetNamespacesForNoNamespaces() {
+        var xmlDoc = document.getElementById("uppercase-xml").contentDocument
+        var namespaceUrls = getNamespaces(xmlDoc)
+        assertEquals(0, countProperties(namespaceUrls))
+    }
+
+    function testGetNamespacesForOneNamespace() {
+        var xmlDoc = document.getElementById("namespaces-xml").contentDocument
+        var namespaceUrls = getNamespaces(xmlDoc)
+        assertEquals(1, countProperties(namespaceUrls))
+        assertEquals("x", namespaceUrls["http://www.w3.org/1999/xhtml"])
+    }
+
+    function testGetNamespacesForTwoNamespaces() {
+        var xmlDoc = document.getElementById("twoNamespaces-xml").contentDocument
+        var namespaceUrls = getNamespaces(xmlDoc)
+        assertEquals(2, countProperties(namespaceUrls))
+        assertEquals("o", namespaceUrls["http://www.example.org/outer"])
+        assertEquals("in", namespaceUrls["http://www.example.org/inner"])
+    }
+
+    function testGetXPathNodeUsingNamespace() {
+        var xmlDoc = document.getElementById("twoNamespaces-xml").contentDocument
+        var prefixes = new Object
+        prefixes["in"] = "http://www.example.org/inner"
+        var list = getXPathNodes(xmlDoc, "//in:inner", prefixes)
+        assertEquals(1, list.length)
+        assertEquals("inner", list[0].localName)
+    }
+
+    function testChoosePrefix() {
+        var node = new Object
+        var prefixes = new Object
+
+        node.prefix = 'abc'
+        node.namespaceURI = 'http://www.example.org/hello'
+        assertEquals('abc', choosePrefix(node, prefixes))
+
+        node.prefix = null
+        assertEquals('h', choosePrefix(node, prefixes))
+
+        node.namespaceURI = 'http://www.example.org/'
+        assertEquals('a', choosePrefix(node, prefixes))
+
+        prefixes['a'] = 1
+        assertEquals('a1', choosePrefix(node, prefixes))
+
+        prefixes['a1'] = 1
+        assertEquals('a2', choosePrefix(node, prefixes))
+    }
+
+    function testGetXPathWithNamespaces() {
+        var xmlDoc = document.getElementById("twoNamespaces-xml").contentDocument
+
+        var startNode = xmlDoc.getElementsByTagName("inner")[0]
+        dumpObject(startNode)
+
+        var prefixes = new Object()
+        prefixes["http://www.example.org/outer"] = "out"
+        prefixes["http://www.example.org/inner"] = "in"
+
+        assertEquals("/out:outer/in:inner", getXPath(startNode, prefixes))
+    }
+
+    // end of tests
+
+    function dumpObject(item) {
+        debug("dumping item: "+item)
+        for (p in item) {
+            debug("item."+p, item[p])
+        }
+    }
+
+    var ready=true
+
+</script>
+</head>
+<body>
+
+  <div id="hello">Hello!</div>
+
+  <div id="hello2">
+      <div>Hello<div>Inner div</div></div>
+      <div>Some<br/>Text</div>
+  </div>
+
+  <table id="table">
+      <tr>
+          <td> </td>
+      </tr>
+
+   </table>
+
+   <iframe id="uppercase-xml" src="examples/uppercase.xml"></iframe>
+   <iframe id="namespaces-xml" src="examples/namespaces.xml"></iframe>
+   <iframe id="twoNamespaces-xml" src="examples/twoNamespaces.xml"></iframe>
+</body>
+</html>
