@@ -2,7 +2,16 @@
 
 <project name="xpathchecker" default="create-xpi">
 
-  <property name="projecturl" value="file:///home/skybrian/projects/xpathchecker"/>
+  <!-- modify these properties for your local environment -->
+  <property name="firefox.binary"
+            description="Path to the firefox binary on your system"
+            value="/Applications/Firefox.app/Contents/MacOS/firefox-bin"/>
+  <property name="firefox.profile"
+            description="The Firefox profile to install into for testing"
+            value="dev"/>
+  <property name="projectdir.url"
+            description="The path to this project on your system, as a URL."
+            value="file:///Users/skybrian/projects/xpathchecker"/>
 
   <target name="clean">
     <delete dir="build"/>
@@ -18,59 +27,17 @@
     <zip destfile="build/xpathchecker.xpi">
       <zipfileset dir="build" includes="xpathchecker.jar" 
                   prefix="chrome" />
-      <zipfileset dir="src" includes="install.rdf" />
+      <zipfileset dir="src" includes="install.rdf chrome.manifest" />
     </zip>
   </target>
     
   <target name="install" depends="clean,create-xpi">
-    <exec executable="firefox">
+    <exec executable="${firefox.binary}">
+      <arg value="-jsconsole"/>
       <arg value="-P"/>
-      <arg value="dev"/>
-      <arg value="${projecturl}/build/xpathchecker.xpi"/>
+      <arg value="${firefox.profile}"/>
+      <arg value="${projectdir.url}/build/xpathchecker.xpi"/>
     </exec>
   </target>
-
-  <target name="run">
-    <exec executable="firefox">
-      <arg value="-P"/>
-      <arg value="dev"/>
-      <arg value="-console"/>
-    </exec>
-  </target>
-							 
-    <target name="installold" depends="clean,create-xpi">
-      <exec executable="/usr/local/apps/firefox-1.0.1/firefox">
-        <arg value="-P"/>
-        <arg value="devold"/>
-        <arg value="${projecturl}/build/xpathchecker.xpi"/>
-      </exec>
-    </target>
-
-
-    <target name="runold">
-      <exec executable="/usr/local/apps/firefox-1.0.1/firefox">
-        <arg value="-P"/>
-        <arg value="devold"/>
-        <!-- <arg value="-console"/> -->
-      </exec>
-    </target>
-
-    <target name="installnew" depends="clean,create-xpi">
-      <exec executable="/usr/local/apps/firefox-1.5rc1/firefox">
-        <arg value="-P"/>
-        <arg value="dev"/>
-        <arg value="${projecturl}/build/xpathchecker.xpi"/>
-      </exec>
-    </target>
-
-
-
-    <target name="runnew">
-      <exec executable="/usr/local/apps/firefox-1.5rc1/firefox">
-        <arg value="-P"/>
-        <arg value="dev"/>
-        <arg value="-console"/>
-      </exec>
-    </target>
 
 </project>
