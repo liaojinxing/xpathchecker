@@ -35,16 +35,31 @@
         assertEquals("HTML", item.parentNode.nodeName);
     }
 
-    function testGetXPathNodes() {
-        var list = xp.getXPathNodes(document, "/html/body", null);
+    function testEvalXPathToHtmlElement() {
+        var list = xp.evalXPath(document, "/html/body", null);
         assertEquals(body, list[0]);
         assertEquals(1, list.length);
     }
 
-    function testGetXPathText() {
-        var list = xp.getXPathNodes(document, "//*[@id='hello']/text()", null);
+    function testEvalXPathToTextList() {
+        var list = xp.evalXPath(document, "//*[@id='hello']/text()", null);
         assertEquals("Hello!", list[0].nodeValue);
         assertEquals(1, list.length);
+    }
+
+    function testEvalXPathToString() {
+        var result = xp.evalXPath(document, "substring(\"hello\",2,5)", null);
+        assertEquals("ello", result);
+    }
+
+    function testEvalXPathToNumber() {
+        var result = xp.evalXPath(document, "2+2", null);
+        assertEquals("4", result);
+    }
+
+    function testEvalXPathToBoolean() {
+        var result = xp.evalXPath(document, "1 = 1", null);
+        assertEquals("true", result);
     }
 
     function testGetNodePath() {
@@ -130,11 +145,11 @@
         assertEquals("in", namespaceUrls["http://www.example.org/inner"]);
     }
 
-    function testGetXPathNodeUsingNamespace() {
+    function testEvalXPathUsingNamespace() {
         var xmlDoc = document.getElementById("twoNamespaces-xml").contentDocument;
         var prefixes = new Object();
         prefixes["in"] = "http://www.example.org/inner";
-        var list = xp.getXPathNodes(xmlDoc, "//in:inner", prefixes);
+        var list = xp.evalXPath(xmlDoc, "//in:inner", prefixes);
         assertEquals(1, list.length);
         assertEquals("inner", list[0].localName);
     }
