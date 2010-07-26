@@ -165,29 +165,33 @@ var xpathchecker = function() {
             return;
         }
 
-        var resultList = getXPathNodes(currentDocument, xpath, prefixes);
+        var result = evalXPath(currentDocument, xpath, prefixes);
 
-        updateStatus(resultList);
-        if(resultList.length>0 &&
-           resultList[0].nodeType==Node.ELEMENT_NODE) {
-            if(currentDocument instanceof HTMLDocument) {
-                updateHtmlResults(resultList);
+        updateStatus(result);
+
+        if (typeof result == 'string') {
+            updateTextResults([result]);
+        } else if (result.length > 0 && result[0].nodeType == Node.ELEMENT_NODE) {
+            if (currentDocument instanceof HTMLDocument) {
+                updateHtmlResults(result);
             } else {
-                updateTextResults(serializeXML(resultList));
+                updateTextResults(serializeXML(result));
             }
         } else {
-            updateTextResults(getNodeValues(resultList));
+            updateTextResults(getNodeValues(result));
         }
     }
 
-    function updateStatus(results) {
+    function updateStatus(result) {
         var status;
-        if(results.length==0) {
+        if (typeof result == 'string') {
+          status = "Returned a value";
+        } else if (result.length == 0) {
           status = "No matches found";
-        } else if(results.length==1) {
+        } else if(result.length == 1) {
           status = "One match found";
-        } else if(results.length>1) {
-          status = results.length+" matches found";
+        } else if(result.length > 1) {
+          status = result.length+" matches found";
         }
         document.getElementById("status").value = status;
     }
@@ -287,7 +291,10 @@ var xpathchecker = function() {
         return namespaceResolver;
     }
 
-    function getXPathNodes(document, xpath, prefixes) {
+    /**
+     * Returns either a string (for a simple result type) or a list of nodes.
+     */
+    function evalXPath(document, xpath, prefixes) {
 
         var resolver = makeResolver(prefixes);
 
@@ -297,15 +304,24 @@ var xpathchecker = function() {
         }
 
         var xpathResult = document.evaluate(xpath, document, makeResolver(prefixes), XPathResult.ANY_TYPE, null);
-        var result = [];
-        var item = xpathResult.iterateNext();
-        while (item != null) {
-            result.push(item);
-            item = xpathResult.iterateNext();
+
+        if (xpathResult.resultType == XPathResult.STRING_TYPE) {
+            return xpathResult.stringValue;
+        } else if (xpathResult.resultType == XPathResult.NUMBER_TYPE) {
+            return xpathResult.numberValue + "";
+        } else if (xpathResult.resultType == XPathResult.BOOLEAN_TYPE) {
+            return xpathResult.booleanValue + "";
+        } else {
+            var result = [];
+            var item = xpathResult.iterateNext();
+            while (item != null) {
+                result.push(item);
+                item = xpathResult.iterateNext();
+            }
+            return result;
         }
-        return result;
     };
-    xp.getXPathNodes = getXPathNodes;
+    xp.evalXPath = evalXPath;
 
     function getXPath(targetNode, prefixesByNamespace) {
         var useLowerCase = (targetNode.ownerDocument instanceof HTMLDocument);
